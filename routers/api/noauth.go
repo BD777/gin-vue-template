@@ -10,14 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetPageAuth(c *gin.Context) {
-	c.JSON(http.StatusOK, e.R(e.OK, constants.PageAuths))
-}
-
 func GetLoginInfo(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	token, err := c.Cookie("token")
+	token, err := c.Cookie(constants.TokenKey)
 	if err != nil {
 		c.JSON(http.StatusOK, e.R(e.NOT_LOGIN, nil))
 		return
@@ -27,6 +23,7 @@ func GetLoginInfo(c *gin.Context) {
 	if err != nil {
 		log.Printf("get login info failed: %v", err)
 		c.JSON(http.StatusOK, e.R(e.NOT_LOGIN, nil))
+		return
 	}
 
 	c.JSON(http.StatusOK, e.R(e.OK, info))
@@ -53,6 +50,6 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("token", info.Token, 3600*24, "/", "localhost", false, true)
+	c.SetCookie(constants.TokenKey, info.Token, 3600*24, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, e.R(e.OK, info))
 }

@@ -1,5 +1,5 @@
 <template>
-  <n-card style="width: 300px; margin: auto;" embedded :bordered="false">
+  <n-card style="width: 300px; margin: auto;" :bordered="false">
     <n-form :model="data.loginForm" label-placement="left" label-width="auto">
       <n-form-item label="用户名">
         <n-input round v-model:value="data.loginForm.username" @keydown.enter="login" />
@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import router from '../router'
 import $backend from '../backend'
 import { NForm, NFormItem, NInput, NButton, NCard, useMessage } from 'naive-ui'
 import { reactive } from 'vue'
@@ -44,7 +45,7 @@ export default {
       if (res.errcode === 0) {
         data.logined = true
         message.success('登录成功')
-        // TODO: redirect to home page
+        router.replace({ path: '/home' })
       } else {
         message.error(`登录失败: ${res.errmsg}`)
       }

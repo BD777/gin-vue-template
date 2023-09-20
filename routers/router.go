@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"gin-vue-template/middleware"
 	"gin-vue-template/pkg/setting"
 	"gin-vue-template/routers/api"
 )
@@ -26,13 +27,23 @@ func InitRouter() *gin.Engine {
 
 	apiGroup := r.Group("/api")
 
-	adminAPI := apiGroup.Group("/admin")
+	noauthAPI := apiGroup.Group("/public")
 	{
-		adminAPI.GET("/pageauth", api.GetPageAuth)
-		adminAPI.GET("/logininfo", api.GetLoginInfo)
-		adminAPI.POST("/login", api.Login)
+		noauthAPI.GET("/logininfo", api.GetLoginInfo)
+		noauthAPI.POST("/login", api.Login)
 	}
-	// TODO: middleware to check login status
+
+	commonAPI := apiGroup.Group("/common")
+	commonAPI.Use(middleware.AuthMiddleware())
+	{
+		commonAPI.GET("/pageauth", api.GetPageAuth)
+	}
+
+	settingAdminAPI := apiGroup.Group("/setting/admin")
+	settingAdminAPI.Use(middleware.AuthMiddleware())
+	{
+		settingAdminAPI.GET("/list", api.ListAdmins)
+	}
 
 	return r
 }

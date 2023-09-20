@@ -29,14 +29,15 @@
 import $backend from './backend'
 import { NMenu, NLayout, NLayoutSider, NMessageProvider, NIcon, NDialogProvider } from "naive-ui"
 import { h, reactive, computed, onMounted } from 'vue'
-import { LogIn, IdCardOutline } from '@vicons/ionicons5'
+import { LogIn, SettingsSharp, HomeSharp } from '@vicons/ionicons5'
 
 function renderIcon (icon) {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
 
 const menuOptions = [
-  { label: '管理员', key: 'admin', icon: renderIcon(IdCardOutline) },
+  { label: '首页', key: 'home', icon: renderIcon(HomeSharp) },
+  { label: '系统设置', key: 'setting', icon: renderIcon(SettingsSharp) }
 ]
 
 const loginOptions = [
@@ -84,7 +85,7 @@ export default {
     async function getPageAuth () {
       return $backend.getPageAuth().then(res => {
         console.log('getPageAuth res', res)
-        res.data.forEach(key => data.authedPages[key] = true)
+        data.authedPages = res.data
       })
     }
 
@@ -103,7 +104,8 @@ export default {
 
     return {
       data,
-      menuOptions: options
+      menuOptions: options,
+      getLoginInfo
     }
   },
   methods: {
@@ -114,7 +116,16 @@ export default {
     }
   },
   mounted () {
-    this.checkedMenu = this.$route.path.substr(1)
+    this.data.checkedMenu = this.$route.path.substring(1)
+  },
+  watch: {
+    '$route.path' () {
+      if (!this.data.logined) {
+        this.getLoginInfo().then(() => {
+          this.data.checkedMenu = this.$route.path.substring(1)
+        })
+      }
+    }
   }
 }
 </script>

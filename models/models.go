@@ -59,3 +59,19 @@ func initTables() {
 func CloseDB() {
 	defer db.Close()
 }
+
+type Pagination struct {
+	Page     int `json:"page"`
+	PageSize int `json:"pageSize"`
+	Total    int `json:"total"`
+}
+
+type ListRequest struct {
+	QueryCount bool
+	Pagination *Pagination
+}
+
+type ListResponse struct {
+	List       []any       `json:"list"`
+	Pagination *Pagination `json:"pagination"`
+}

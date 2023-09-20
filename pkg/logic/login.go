@@ -59,7 +59,7 @@ func passwordHash(password string) string {
 }
 
 func Login(ctx context.Context, username, password string) (info *LoginInfo, err error) {
-	admin := models.GetAdmin(username, passwordHash(password))
+	admin := models.GetAdmin(ctx, username, passwordHash(password))
 	if admin == nil {
 		return nil, fmt.Errorf("invalid username or password")
 	}

@@ -28,17 +28,26 @@ $axios.interceptors.response.use(function (response) {
 
 export default {
   async getLoginInfo() {
-    return $axios.get(`admin/logininfo`).then(response => response.data)
+    return $axios.get(`public/logininfo`).then(response => response.data)
   },
 
   async login(username, password) {
-    return $axios.post(`admin/login`, {
+    return $axios.post(`public/login`, {
       username,
       password
     }).then(response => response.data)
   },
 
   async getPageAuth() {
-    return $axios.get(`admin/pageauth`).then(response => response.data)
+    return $axios.get(`common/pageauth`).then(response => response.data)
+  },
+
+  async listAdmins(pagination) {
+    return $axios.get(`setting/admin/list`, {
+      params: {
+        page: pagination.page,
+        pagesize: pagination.pageSize
+      }
+    }).then(response => response.data)
   }
 }
