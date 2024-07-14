@@ -1,15 +1,14 @@
 package middleware
 
 import (
-	"gin-vue-template/constants"
-	"gin-vue-template/pkg/logic"
+	"gin-vue-template/pkg/constants"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func AuthMiddleware() gin.HandlerFunc {
+func (m *Middleware) AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
 
@@ -21,7 +20,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		loginInfo, err := logic.GetLoginInfo(ctx, token)
+		loginInfo, err := m.logic.GetLoginInfo(ctx, token)
 		if err != nil {
 			log.Printf("[AuthMiddleware] logic.GetLoginInfo error: %v", err)
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})

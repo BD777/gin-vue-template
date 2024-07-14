@@ -13,7 +13,7 @@
 
 ### DEV
 1. `bash ./devrun.sh`
-2. `cd fronend && npm run serve`
+2. `cd frontend && npm run serve`
 
 ## File Tree
 - 📁 gin-vue-template

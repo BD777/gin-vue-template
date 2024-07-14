@@ -1,0 +1,18 @@
+app:
+  run_mode: debug
+
+http_server:
+  port: 8000
+  read_timeout: 60
+  write_timeout: 60
+
+mysql:
+  user: thedbuser
+  password: thedbpassword
+  host: 127.0.0.1:3306
+  name: thedb
+
+redis:
+  addr: localhost:6379
+  passsword:
+  db: 10

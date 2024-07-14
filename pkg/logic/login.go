@@ -5,13 +5,9 @@ import (
 	"crypto/sha1"
 	"encoding/json"
 	"fmt"
-	"gin-vue-template/models"
-	"gin-vue-template/pkg/infra"
 	"log"
 	"time"
 )
-
-var loginRedis = infra.NewRedisWithPrefix("login")
 
 type LoginInfo struct {
 	Username  string `json:"username"`
@@ -24,8 +20,8 @@ func (l *LoginInfo) MarshalBinary() ([]byte, error) {
 	return json.Marshal(l)
 }
 
-func GetLoginInfo(ctx context.Context, token string) (info *LoginInfo, err error) {
-	value, err := loginRedis.Get(ctx, token).Result()
+func (l *Logic) GetLoginInfo(ctx context.Context, token string) (info *LoginInfo, err error) {
+	value, err := l.loginRedis.Get(ctx, token).Result()
 	if err != nil {
 		return nil, fmt.Errorf("get login info from redis failed: %w", err)
 	}
@@ -58,8 +54,8 @@ func passwordHash(password string) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-func Login(ctx context.Context, username, password string) (info *LoginInfo, err error) {
-	admin := models.GetAdmin(ctx, username, passwordHash(password))
+func (l *Logic) Login(ctx context.Context, username, password string) (info *LoginInfo, err error) {
+	admin := l.dao.GetAdmin(ctx, username, passwordHash(password))
 	if admin == nil {
 		return nil, fmt.Errorf("invalid username or password")
 	}
@@ -71,7 +67,7 @@ func Login(ctx context.Context, username, password string) (info *LoginInfo, err
 	}
 	info.Token = genToken(info)
 
-	err = loginRedis.Set(ctx, info.Token, info, time.Hour*24).Err()
+	err = l.loginRedis.Set(ctx, info.Token, info, time.Hour*24).Err()
 	if err != nil {
 		return nil, fmt.Errorf("set login info to redis failed: %w", err)
 	}

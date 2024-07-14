@@ -46,7 +46,7 @@ export default {
     return $axios.get(`setting/admin/list`, {
       params: {
         page: pagination.page,
-        pagesize: pagination.pageSize
+        pageSize: pagination.pageSize
       }
     }).then(response => response.data)
   }

@@ -1,35 +1,71 @@
 package e
 
-const (
-	SYSTEM_ERROR = -1
-	OK           = 0
+import (
+	"net/http"
 
-	NOT_LOGIN  = 100
-	NOT_AUTH   = 101
-	LOGIN_FAIL = 102
-
-	INVALID_PARAMS = 200
+	"github.com/gin-gonic/gin"
 )
 
-var MsgFlags = map[int]string{
-	SYSTEM_ERROR:   "系统错误",
-	OK:             "ok",
-	NOT_LOGIN:      "未登录",
-	NOT_AUTH:       "未授权",
-	LOGIN_FAIL:     "登录失败",
-	INVALID_PARAMS: "请求参数错误",
+type RetCode int64
+
+const (
+	RetCodeSystem       RetCode = -1
+	RetCodeOK           RetCode = 0
+	RetCodeDataNotFound RetCode = 1
+
+	RetCodeNotLogin      RetCode = 100
+	RetCodeNotAuth       RetCode = 101
+	RetCodeLoginFail     RetCode = 102
+	RetCodeInvalidTenant RetCode = 103
+
+	RetCodeInvalidParams RetCode = 200
+	RetCodeNotSupport    RetCode = 201
+	RetCodeDuplication   RetCode = 202
+)
+
+var retCodeNames = map[RetCode]string{
+	RetCodeSystem:        "系统错误",
+	RetCodeOK:            "ok",
+	RetCodeDataNotFound:  "未找到数据",
+	RetCodeNotLogin:      "未登录",
+	RetCodeNotAuth:       "未授权",
+	RetCodeLoginFail:     "登录失败",
+	RetCodeInvalidTenant: "无效租户",
+	RetCodeInvalidParams: "请求参数错误",
+	RetCodeNotSupport:    "未支持",
+	RetCodeDuplication:   "已有重复数据",
+}
+
+func (c RetCode) String() string {
+	return retCodeNames[c]
 }
 
 type ResponseData struct {
-	ErrCode int    `json:"errcode"`
-	ErrMsg  string `json:"errmsg"`
-	Data    any    `json:"data"`
+	ErrCode RetCode `json:"errcode"`
+	ErrMsg  string  `json:"errmsg"`
+	Data    any     `json:"data"`
 }
 
-func R(code int, data any) ResponseData {
+func R(code RetCode, data any) ResponseData {
 	return ResponseData{
 		ErrCode: code,
-		ErrMsg:  MsgFlags[code],
+		ErrMsg:  code.String(),
 		Data:    data,
 	}
+}
+
+func OK(data any) ResponseData {
+	return ResponseData{
+		ErrCode: RetCodeOK,
+		ErrMsg:  RetCodeOK.String(),
+		Data:    data,
+	}
+}
+
+func GinR(c *gin.Context, code RetCode, data any) {
+	c.JSON(http.StatusOK, R(code, data))
+}
+
+func GinOK(c *gin.Context, data any) {
+	c.JSON(http.StatusOK, OK(data))
 }

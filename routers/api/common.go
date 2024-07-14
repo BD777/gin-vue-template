@@ -1,7 +1,7 @@
 package api
 
 import (
-	"gin-vue-template/constants"
+	"gin-vue-template/pkg/constants"
 	"gin-vue-template/pkg/e"
 	"gin-vue-template/pkg/logic"
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetPageAuth(c *gin.Context) {
+func (a *API) GetPageAuth(c *gin.Context) {
 	info, ok := c.Get(constants.AuthKey)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{})
@@ -23,5 +23,6 @@ func GetPageAuth(c *gin.Context) {
 			resp[a.Page] = true
 		}
 	}
-	c.JSON(http.StatusOK, e.R(e.OK, resp))
+
+	e.GinOK(c, resp)
 }

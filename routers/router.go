@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"gin-vue-template/middleware"
-	"gin-vue-template/pkg/setting"
+	"gin-vue-template/config"
 	"gin-vue-template/routers/api"
+	"gin-vue-template/routers/middleware"
 )
 
 func initFrontendFiles(r *gin.Engine) {
@@ -17,32 +17,34 @@ func initFrontendFiles(r *gin.Engine) {
 	r.StaticFS("/css", http.Dir("./frontend/dist/css"))
 }
 
-func InitRouter() *gin.Engine {
+func NewRouter(cfg *config.Config, mw *middleware.Middleware, a *api.API) *gin.Engine {
 	r := gin.New()
 	initFrontendFiles(r)
 
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
-	gin.SetMode(setting.RunMode)
+	gin.SetMode(cfg.App.RunMode)
+
+	r.Use(mw.InitMiddleware())
 
 	apiGroup := r.Group("/api")
 
 	noauthAPI := apiGroup.Group("/public")
 	{
-		noauthAPI.GET("/logininfo", api.GetLoginInfo)
-		noauthAPI.POST("/login", api.Login)
+		noauthAPI.GET("/logininfo", a.GetLoginInfo)
+		noauthAPI.POST("/login", a.Login)
 	}
 
 	commonAPI := apiGroup.Group("/common")
-	commonAPI.Use(middleware.AuthMiddleware())
+	commonAPI.Use(mw.AuthMiddleware())
 	{
-		commonAPI.GET("/pageauth", api.GetPageAuth)
+		commonAPI.GET("/pageauth", a.GetPageAuth)
 	}
 
 	settingAdminAPI := apiGroup.Group("/setting/admin")
-	settingAdminAPI.Use(middleware.AuthMiddleware())
+	settingAdminAPI.Use(mw.AuthMiddleware())
 	{
-		settingAdminAPI.GET("/list", api.ListAdmins)
+		settingAdminAPI.GET("/list", a.ListAdmins)
 	}
 
 	return r

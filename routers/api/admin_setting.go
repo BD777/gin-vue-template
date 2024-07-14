@@ -1,17 +1,17 @@
 package api
 
 import (
-	"gin-vue-template/constants"
-	"gin-vue-template/models"
+	"gin-vue-template/pkg/constants"
 	"gin-vue-template/pkg/e"
 	"gin-vue-template/pkg/logic"
+	"gin-vue-template/pkg/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func ListAdmins(c *gin.Context) {
-	ctx := c.Request.Context()
+func (a *API) ListAdmins(c *gin.Context) {
+	ctx := NewGinContextHelper(c).Context()
 
 	info, ok := c.Get(constants.AuthKey)
 	if !ok {
@@ -25,11 +25,16 @@ func ListAdmins(c *gin.Context) {
 		return
 	}
 
-	helper := NewGinContextHelper(c)
-	pagination := helper.GetPagination()
-	admins := models.ListAdmins(ctx, &models.ListRequest{
+	pagination := &models.Pagination{}
+	if err := c.ShouldBindQuery(pagination); err != nil {
+		e.GinR(c, e.RetCodeInvalidParams, nil)
+		return
+	}
+
+	admins := a.dao.ListAdmins(ctx, &models.ListRequest{
 		QueryCount: true,
 		Pagination: pagination,
 	})
-	c.JSON(http.StatusOK, e.R(e.OK, admins))
+
+	e.GinOK(c, admins)
 }
