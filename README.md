@@ -12,32 +12,39 @@
 6. install redis
 
 ### DEV
-1. `bash ./devrun.sh`
-2. `cd frontend && npm run serve`
+1. `bash ./go_generate.sh`
+2. `bash ./devrun.sh`
+3. `cd frontend && npm run serve`
 
 ## File Tree
 - 📁 gin-vue-template
+  - 📁 cmd
+    - 📄 main.go // program entry
   - 📁 conf
-    - 📄 app.ini // some configuration items of course
-  - 📁 constants // some constants
-    - 📄 ...
-  - 📁 middleware // middleware for gin
-    - 📄 auth_middleware.go // authorize, abort if unauthorized
-  - 📁 models // connecting to db
-    - 📄 ...
+    - 📄 app.yaml // some configuration items of course
+  - 📁 config // read configuration item from conf/app.ini
+    - config.go
   - 📁 pkg
+    - 📁 constants // some constants
+      - 📄 ...
     - 📁 e // errcode
         - 📄 e.go
     - 📁 infra
-        - 📄 redis.go // redis
+      - 📁 redis // redis
+      - 📁 logger // init logrus and impl some function for log
     - 📁 logic // do some logic for your api
-    - 📁 setting // read configuration item from conf/app.ini
+    - 📁 models // connecting to db
+      - 📄 ... // some models and DAO functions
+    - 📁 service // http service provider for wire gen
     - 📁 utils // maybe put some utils here
+    - 📁 wire // wire
   - 📁 routers
     - 📁 api // yep, http api
+    - 📁 middleware // middleware for gin
+      - 📄 init_middleware.go // initialize, generate logid for example
+      - 📄 auth_middleware.go // authorize, abort if unauthorized
     - 📄 router.go // router definition
   - 📁 frontend // vue proj
-
 
 
 ## Reference
